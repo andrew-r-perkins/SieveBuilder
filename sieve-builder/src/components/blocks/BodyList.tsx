@@ -1,12 +1,13 @@
 import { SortableContext, verticalListSortingStrategy } from '@dnd-kit/sortable';
 import { useDroppable } from '@dnd-kit/core';
 import type { BodyBlock, TopLevelBlock, NodeId } from '@/types/sieve';
-import { isIfBlock } from '@/types/sieve';
+import { isIfBlock, isCommentBlock } from '@/types/sieve';
 import { ActionBlock } from './ActionBlock';
 import { IfBlock } from './IfBlock';
+import { CommentBlock } from './CommentBlock';
 import { useScriptStore } from '@/store/useScriptStore';
 import { newId } from '@/utils/idgen';
-import type { ActionBlock as ActionBlockType, IfBlock as IfBlockType } from '@/types/sieve';
+import type { ActionBlock as ActionBlockType, IfBlock as IfBlockType, CommentBlock as CommentBlockType } from '@/types/sieve';
 
 interface Props {
   containerId: NodeId;
@@ -35,6 +36,11 @@ export function BodyList({ containerId, blocks, indent = 0 }: Props) {
     doAddBlock(containerId, blocks.length, block);
   }
 
+  function addComment() {
+    const block: CommentBlockType = { id: newId(), kind: 'comment', style: 'hash', text: '' };
+    doAddBlock(containerId, blocks.length, block);
+  }
+
   return (
     <div
       ref={setNodeRef}
@@ -52,7 +58,9 @@ export function BodyList({ containerId, blocks, indent = 0 }: Props) {
         {blocks.map(block =>
           isIfBlock(block)
             ? <IfBlock key={block.id} block={block} />
-            : <ActionBlock key={block.id} block={block} />
+            : isCommentBlock(block)
+              ? <CommentBlock key={block.id} block={block} />
+              : <ActionBlock key={block.id} block={block} />
         )}
       </SortableContext>
 
@@ -63,6 +71,7 @@ export function BodyList({ containerId, blocks, indent = 0 }: Props) {
       <div style={styles.addRow}>
         <button onClick={addAction} style={styles.addBtn}>+ action</button>
         <button onClick={addIf} style={styles.addBtn}>+ if</button>
+        <button onClick={addComment} style={styles.addBtn}>+ comment</button>
       </div>
     </div>
   );

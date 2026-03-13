@@ -4,13 +4,14 @@ A visual drag-and-drop editor for [Sieve](https://www.rfc-editor.org/rfc/rfc5228
 
 Build complex email filters without writing code — then export ready-to-use `.sieve` files.
 
-![SieveBuilder screenshot](sieve-builder/src/assets/hero.png)
+![SieveBuilder screenshot](sieve-builder/src/assets/ScreenShot.jpg)
 
 ---
 
 ## Features
 
 - **Visual block editor** — drag action blocks and if/elsif/else containers onto a canvas
+- **Comments** — insert hash (`#`) or bracket (`/* */`) comments anywhere; click to edit, toggle style, drag to reorder
 - **Live preview** — the generated Sieve script updates in real time as you build
 - **Import** — paste or load an existing `.sieve` file; unsupported constructs are flagged with a warning
 - **Export** — download a `.sieve` file with `require` auto-generated from the actions you've used
@@ -79,7 +80,7 @@ sieve-builder/src/
   generator/      # AST → .sieve string + require collector
   validator/      # Real-time validation rules
   components/
-    blocks/       # Canvas, IfBlock, ActionBlock, BodyList
+    blocks/       # Canvas, IfBlock, ActionBlock, CommentBlock, BodyList
     editors/      # ConditionEditor, ActionEditor
     layout/       # Toolbar, SplitLayout, PreviewPane, ValidationPanel
   hooks/          # useUndo, useValidation, useGenerator

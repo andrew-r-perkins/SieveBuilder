@@ -1,11 +1,12 @@
 export type TokenType =
-  | 'identifier' | 'tag' | 'string' | 'number' | 'bracket' | 'semicolon' | 'eof';
+  | 'identifier' | 'tag' | 'string' | 'number' | 'bracket' | 'semicolon' | 'comment' | 'eof';
 
 export interface Token {
   type: TokenType;
   value: string;
   line: number;
   col: number;
+  commentStyle?: 'hash' | 'bracket';
 }
 
 export function tokenize(src: string): Token[] {
@@ -30,17 +31,26 @@ export function tokenize(src: string): Token[] {
 
     // Line comment
     if (ch === '#') {
-      while (pos < src.length && current() !== '\n') advance();
+      const startLine = line;
+      const startCol = col;
+      advance(); // skip #
+      let text = '';
+      while (pos < src.length && current() !== '\n') text += advance();
+      tokens.push({ type: 'comment', value: text.replace(/^\s/, ''), commentStyle: 'hash', line: startLine, col: startCol });
       continue;
     }
 
     // Block comment
     if (ch === '/' && peek() === '*') {
-      advance(); advance();
+      const startLine = line;
+      const startCol = col;
+      advance(); advance(); // skip /*
+      let text = '';
       while (pos < src.length) {
         if (current() === '*' && peek() === '/') { advance(); advance(); break; }
-        advance();
+        text += advance();
       }
+      tokens.push({ type: 'comment', value: text.replace(/^\s+|\s+$/g, ''), commentStyle: 'bracket', line: startLine, col: startCol });
       continue;
     }
 

@@ -21,6 +21,16 @@ export type TestNode =
   | { id: NodeId; kind: 'anyof'; tests: TestNode[] }
   | { id: NodeId; kind: 'not'; test: TestNode };
 
+// ─── Comment blocks ───────────────────────────────────────────────────────────
+
+export interface CommentBlock {
+  id: NodeId;
+  kind: 'comment';
+  /** hash = # …  /  bracket = /* … *\/ */
+  style: 'hash' | 'bracket';
+  text: string;
+}
+
 // ─── Action blocks (leaf blocks) ─────────────────────────────────────────────
 
 export type ActionBlock =
@@ -38,7 +48,7 @@ export type SetModifier = ':lower' | ':upper' | ':lowerfirst' | ':upperfirst' | 
 // ─── Container blocks ────────────────────────────────────────────────────────
 
 /** Contents of any if/elsif/else branch body */
-export type BodyBlock = ActionBlock | IfBlock;
+export type BodyBlock = ActionBlock | IfBlock | CommentBlock;
 
 export interface ElseBlock {
   id: NodeId;
@@ -66,7 +76,7 @@ export interface IfBlock {
 
 // ─── Script root ─────────────────────────────────────────────────────────────
 
-export type TopLevelBlock = ActionBlock | IfBlock;
+export type TopLevelBlock = ActionBlock | IfBlock | CommentBlock;
 
 export interface SieveScript {
   id: NodeId;
@@ -79,6 +89,10 @@ export function isIfBlock(block: BodyBlock | TopLevelBlock): block is IfBlock {
   return block.kind === 'if';
 }
 
+export function isCommentBlock(block: BodyBlock | TopLevelBlock): block is CommentBlock {
+  return block.kind === 'comment';
+}
+
 export function isActionBlock(block: BodyBlock | TopLevelBlock): block is ActionBlock {
-  return block.kind !== 'if';
+  return block.kind !== 'if' && block.kind !== 'comment';
 }

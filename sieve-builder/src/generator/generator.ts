@@ -1,6 +1,6 @@
 import type {
   SieveScript, TopLevelBlock, BodyBlock, IfBlock,
-  ElsifBlock, ElseBlock, TestNode, ActionBlock,
+  ElsifBlock, ElseBlock, TestNode, ActionBlock, CommentBlock,
 } from '../types/sieve';
 import { collectRequires } from './requireCollector';
 
@@ -28,7 +28,24 @@ export function generateSieve(script: SieveScript): string {
 
 function emitBlock(block: TopLevelBlock | BodyBlock, depth: number): string[] {
   if (block.kind === 'if') return emitIfBlock(block, depth);
+  if (block.kind === 'comment') return emitCommentBlock(block, depth);
   return emitActionBlock(block, depth);
+}
+
+function emitCommentBlock(block: CommentBlock, depth: number): string[] {
+  const ind = indent(depth);
+  if (block.style === 'hash') {
+    // Each line gets its own # prefix
+    if (!block.text) return [`${ind}#`];
+    return block.text.split('\n').map(line => `${ind}# ${line}`);
+  } else {
+    // Bracket comment
+    if (!block.text.includes('\n')) {
+      return [`${ind}/* ${block.text} */`];
+    }
+    const lines = block.text.split('\n');
+    return [`${ind}/*`, ...lines.map(l => `${ind} * ${l}`), `${ind} */`];
+  }
 }
 
 function indent(depth: number): string {

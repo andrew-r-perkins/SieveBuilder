@@ -1,7 +1,7 @@
 import { tokenize, type Token } from './tokenizer';
 import type {
   SieveScript, TopLevelBlock, BodyBlock, IfBlock, ElsifBlock, ElseBlock,
-  ActionBlock, TestNode, MatchType, Comparator, AddressPart, SetModifier,
+  ActionBlock, CommentBlock, TestNode, MatchType, Comparator, AddressPart, SetModifier,
 } from '../types/sieve';
 import type { ParseError } from '../types/errors';
 import { newId } from '../utils/idgen';
@@ -241,6 +241,18 @@ export function parseSieve(src: string): { script: SieveScript | null; errors: P
   // ─── Commands ───────────────────────────────────────────────────────────────
 
   function parseCommand(): TopLevelBlock | 'require' | null {
+    // Comment tokens become CommentBlock nodes
+    if (at('comment')) {
+      const t = consume();
+      const comment: CommentBlock = {
+        id: newId(),
+        kind: 'comment',
+        style: t.commentStyle ?? 'hash',
+        text: t.value,
+      };
+      return comment;
+    }
+
     const t = peek();
     if (t.type !== 'identifier') return fail(`Expected command, got "${t.value}"`);
     const name = consume().value.toLowerCase();

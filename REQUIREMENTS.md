@@ -29,6 +29,9 @@ A locally-run web application for visually creating, editing, and exporting Siev
 - Match types: `:is`, `:contains`, `:matches`
 - Comparators: `i;octet`, `i;ascii-casemap`
 - Address parts: `:localpart`, `:domain`, `:all`
+- Comments: both RFC 5228 comment styles supported
+  - Hash comments (`# text`) — single-line
+  - Bracket comments (`/* text */`) — single or multi-line
 
 **Extensions supported:**
 - `reject` / `ereject`
@@ -50,6 +53,10 @@ A locally-run web application for visually creating, editing, and exporting Siev
   - Body contains child action blocks and/or nested `if` containers
   - `elsif` and `else` are attached sub-containers of the parent `if`
 - Leaf blocks represent individual actions (`fileinto`, `redirect`, `discard`, `keep`, `stop`, `redirect`, `reject`, `vacation`)
+- **Comment blocks** can be inserted anywhere in the block sequence:
+  - Inline text editing with click-to-edit
+  - Toggle between hash (`#`) and bracket (`/* */`) style per block
+  - Draggable and reorderable like any other block
 - Blocks can be **dragged to reorder** within their parent container
 - Blocks can be **dragged into or out of** `if` containers to restructure nesting
 
